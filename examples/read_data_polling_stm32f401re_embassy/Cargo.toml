@@ -17,7 +17,7 @@ cortex-m-rt = "0.7.0"
 panic-probe = { version = "0.3", features = ["print-defmt"] }
 heapless = { version = "0.8", default-features = false }
 
-ilps22qs-rs = { path = "../../" }
+ilps22qs-rs = "1.0.0"
 
 [[bin]]
 name = "read_data_polling_stm32f401re_embassy"
