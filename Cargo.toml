@@ -13,6 +13,9 @@ description = """
     sensor with user-selectable full scale and I2C or SPI interfaces.
 """
 
+[lib]
+doctest = false
+
 [dependencies]
 bitfield-struct = "0.11.0"
 embedded-hal = "1.0.0"
