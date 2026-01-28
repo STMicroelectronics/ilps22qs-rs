@@ -1,7 +1,10 @@
-use crate::{BusOperation, Error, Ilps22qs};
+use super::super::{
+    BusOperation, DelayNs, Error, Ilps22qs, RegisterOperation, SensorOperation, bisync,
+    register::OnState,
+};
+
 use bitfield_struct::bitfield;
 use derive_more::TryFrom;
-use embedded_hal::delay::DelayNs;
 use st_mem_bank_macro::register;
 
 /// Represents the register addresses for device configuration and data retrieval.
@@ -82,7 +85,7 @@ pub enum Reg {
 /// The bit order for this struct can be configured using the `bit_order_msb` feature:
 /// * `Msb`: Most significant bit first.
 /// * `Lsb`: Least significant bit first (default).
-#[register(address = Reg::InterruptCfg, access_type = Ilps22qs, generics = 2)]
+#[register(address = Reg::InterruptCfg, access_type = "Ilps22qs<B, T, OnState>")]
 #[cfg_attr(feature = "bit_order_msb", bitfield(u8, order = Msb))]
 #[cfg_attr(not(feature = "bit_order_msb"), bitfield(u8, order = Lsb))]
 pub struct InterruptCfg {
@@ -115,7 +118,7 @@ pub struct InterruptCfg {
 /// The bit order for this struct can be configured using the `bit_order_msb` feature:
 /// * `Msb`: Most significant bit first.
 /// * `Lsb`: Least significant bit first (default).
-#[register(address = Reg::ThsPL, access_type = Ilps22qs, generics = 2)]
+#[register(address = Reg::ThsPL, access_type = "Ilps22qs<B, T, OnState>")]
 #[cfg_attr(feature = "bit_order_msb", bitfield(u16, order = Msb))]
 #[cfg_attr(not(feature = "bit_order_msb"), bitfield(u16, order = Lsb))]
 pub struct ThsP {
@@ -139,7 +142,7 @@ pub struct ThsP {
 /// The bit order for this struct can be configured using the `bit_order_msb` feature:
 /// * `Msb`: Most significant bit first.
 /// * `Lsb`: Least significant bit first (default).
-#[register(address = Reg::IfCtrl, access_type = Ilps22qs, generics = 2)]
+#[register(address = Reg::IfCtrl, access_type = "Ilps22qs<B, T, OnState>")]
 #[cfg_attr(feature = "bit_order_msb", bitfield(u8, order = Msb))]
 #[cfg_attr(not(feature = "bit_order_msb"), bitfield(u8, order = Lsb))]
 pub struct IfCtrl {
@@ -168,7 +171,7 @@ pub struct IfCtrl {
 /// The bit order for this struct can be configured using the `bit_order_msb` feature:
 /// * `Msb`: Most significant bit first.
 /// * `Lsb`: Least significant bit first (default).
-#[register(address = Reg::CtrlReg1, access_type = Ilps22qs, generics = 2)]
+#[register(address = Reg::CtrlReg1, access_type = "Ilps22qs<B, T, OnState>")]
 #[cfg_attr(feature = "bit_order_msb", bitfield(u8, order = Msb))]
 #[cfg_attr(not(feature = "bit_order_msb"), bitfield(u8, order = Lsb))]
 pub struct CtrlReg1 {
@@ -194,7 +197,7 @@ pub struct CtrlReg1 {
 /// The bit order for this struct can be configured using the `bit_order_msb` feature:
 /// * `Msb`: Most significant bit first.
 /// * `Lsb`: Least significant bit first (default).
-#[register(address = Reg::CtrlReg2, access_type = Ilps22qs, generics = 2)]
+#[register(address = Reg::CtrlReg2, access_type = "Ilps22qs<B, T, OnState>")]
 #[cfg_attr(feature = "bit_order_msb", bitfield(u8, order = Msb))]
 #[cfg_attr(not(feature = "bit_order_msb"), bitfield(u8, order = Lsb))]
 pub struct CtrlReg2 {
@@ -227,7 +230,7 @@ pub struct CtrlReg2 {
 /// The bit order for this struct can be configured using the `bit_order_msb` feature:
 /// * `Msb`: Most significant bit first.
 /// * `Lsb`: Least significant bit first (default).
-#[register(address = Reg::CtrlReg3, access_type = Ilps22qs, generics = 2)]
+#[register(address = Reg::CtrlReg3, access_type = "Ilps22qs<B, T, OnState>")]
 #[cfg_attr(feature = "bit_order_msb", bitfield(u8, order = Msb))]
 #[cfg_attr(not(feature = "bit_order_msb"), bitfield(u8, order = Lsb))]
 pub struct CtrlReg3 {
@@ -255,7 +258,7 @@ pub struct CtrlReg3 {
 /// The bit order for this struct can be configured using the `bit_order_msb` feature:
 /// * `Msb`: Most significant bit first.
 /// * `Lsb`: Least significant bit first (default).
-#[register(address = Reg::FifoCtrl, access_type = Ilps22qs, generics = 2)]
+#[register(address = Reg::FifoCtrl, access_type = "Ilps22qs<B, T, OnState>")]
 #[cfg_attr(feature = "bit_order_msb", bitfield(u8, order = Msb))]
 #[cfg_attr(not(feature = "bit_order_msb"), bitfield(u8, order = Lsb))]
 pub struct FifoCtrl {
@@ -279,7 +282,7 @@ pub struct FifoCtrl {
 /// The bit order for this struct can be configured using the `bit_order_msb` feature:
 /// * `Msb`: Most significant bit first.
 /// * `Lsb`: Least significant bit first (default).
-#[register(address = Reg::FifoWtm, access_type = Ilps22qs, generics = 2)]
+#[register(address = Reg::FifoWtm, access_type = "Ilps22qs<B, T, OnState>")]
 #[cfg_attr(feature = "bit_order_msb", bitfield(u8, order = Msb))]
 #[cfg_attr(not(feature = "bit_order_msb"), bitfield(u8, order = Lsb))]
 pub struct FifoWtm {
@@ -297,7 +300,7 @@ pub struct FifoWtm {
 /// The bit order for this struct can be configured using the `bit_order_msb` feature:
 /// * `Msb`: Most significant bit first.
 /// * `Lsb`: Least significant bit first (default).
-#[register(address = Reg::RefPL, access_type = Ilps22qs, generics = 2)]
+#[register(address = Reg::RefPL, access_type = "Ilps22qs<B, T, OnState>")]
 #[cfg_attr(feature = "bit_order_msb", bitfield(u16, order = Msb))]
 #[cfg_attr(not(feature = "bit_order_msb"), bitfield(u16, order = Lsb))]
 pub struct RefP {
@@ -313,7 +316,7 @@ pub struct RefP {
 /// The bit order for this struct can be configured using the `bit_order_msb` feature:
 /// * `Msb`: Most significant bit first.
 /// * `Lsb`: Least significant bit first (default).
-#[register(address = Reg::I3cIfCtrl, access_type = Ilps22qs, generics = 2)]
+#[register(address = Reg::I3cIfCtrl, access_type = "Ilps22qs<B, T, OnState>")]
 #[cfg_attr(feature = "bit_order_msb", bitfield(u8, order = Msb))]
 #[cfg_attr(not(feature = "bit_order_msb"), bitfield(u8, order = Lsb))]
 pub struct I3cIfCtrl {
@@ -334,7 +337,7 @@ pub struct I3cIfCtrl {
 /// # Fields
 ///
 /// * `rpds` - The pressure offset calibration value as a 16-bit signed integer (read-only).
-#[register(address = Reg::RpdsL, access_type = Ilps22qs, generics = 2)]
+#[register(address = Reg::RpdsL, access_type = "Ilps22qs<B, T, OnState>")]
 #[cfg_attr(feature = "bit_order_msb", bitfield(u16, order = Msb))]
 #[cfg_attr(not(feature = "bit_order_msb"), bitfield(u16, order = Lsb))]
 pub struct Rpds {
@@ -354,7 +357,7 @@ pub struct Rpds {
 /// The bit order for this struct can be configured using the `bit_order_msb` feature:
 /// * `Msb`: Most significant bit first.
 /// * `Lsb`: Least significant bit first (default).
-#[register(address = Reg::IntSource, access_type = Ilps22qs, generics = 2)]
+#[register(address = Reg::IntSource, access_type = "Ilps22qs<B, T, OnState>")]
 #[cfg_attr(feature = "bit_order_msb", bitfield(u8, order = Msb))]
 #[cfg_attr(not(feature = "bit_order_msb"), bitfield(u8, order = Lsb))]
 pub struct IntSource {
@@ -378,7 +381,7 @@ pub struct IntSource {
 /// The bit order for this struct can be configured using the `bit_order_msb` feature:
 /// * `Msb`: Most significant bit first.
 /// * `Lsb`: Least significant bit first (default).
-#[register(address = Reg::FifoStatus1, access_type = Ilps22qs, generics = 2)]
+#[register(address = Reg::FifoStatus1, access_type = "Ilps22qs<B, T, OnState>")]
 #[cfg_attr(feature = "bit_order_msb", bitfield(u8, order = Msb))]
 #[cfg_attr(not(feature = "bit_order_msb"), bitfield(u8, order = Lsb))]
 pub struct FifoStatus1 {
@@ -396,7 +399,7 @@ pub struct FifoStatus1 {
 /// The bit order for this struct can be configured using the `bit_order_msb` feature:
 /// * `Msb`: Most significant bit first.
 /// * `Lsb`: Least significant bit first (default).
-#[register(address = Reg::FifoStatus2, access_type = Ilps22qs, generics = 2)]
+#[register(address = Reg::FifoStatus2, access_type = "Ilps22qs<B, T, OnState>")]
 #[cfg_attr(feature = "bit_order_msb", bitfield(u8, order = Msb))]
 #[cfg_attr(not(feature = "bit_order_msb"), bitfield(u8, order = Lsb))]
 pub struct FifoStatus2 {
@@ -423,7 +426,7 @@ pub struct FifoStatus2 {
 /// The bit order for this struct can be configured using the `bit_order_msb` feature:
 /// * `Msb`: Most significant bit first.
 /// * `Lsb`: Least significant bit first (default).
-#[register(address = Reg::Status, access_type = Ilps22qs, generics = 2)]
+#[register(address = Reg::Status, access_type = "Ilps22qs<B, T, OnState>")]
 #[cfg_attr(feature = "bit_order_msb", bitfield(u8, order = Msb))]
 #[cfg_attr(not(feature = "bit_order_msb"), bitfield(u8, order = Lsb))]
 pub struct Status {
@@ -451,7 +454,7 @@ pub struct Status {
 /// # Fields
 ///
 /// * `pout` - The raw pressure output value as a 32-bit signed integer (read-only).
-#[register(address = Reg::PressOutXl, access_type = Ilps22qs, generics = 2)]
+#[register(address = Reg::PressOutXl, access_type = "Ilps22qs<B, T, OnState>")]
 #[cfg_attr(feature = "bit_order_msb", bitfield(u32, order = Msb))]
 #[cfg_attr(not(feature = "bit_order_msb"), bitfield(u32, order = Lsb))]
 pub struct PressOut {
@@ -468,7 +471,7 @@ pub struct PressOut {
 /// # Fields
 ///
 /// * `tout` - The raw temperature output value as a 16-bit signed integer (read-only).
-#[register(address = Reg::TempOutL, access_type = Ilps22qs, generics = 2)]
+#[register(address = Reg::TempOutL, access_type = "Ilps22qs<B, T, OnState>")]
 #[cfg_attr(feature = "bit_order_msb", bitfield(u16, order = Msb))]
 #[cfg_attr(not(feature = "bit_order_msb"), bitfield(u16, order = Lsb))]
 pub struct TempOut {
@@ -486,7 +489,7 @@ pub struct TempOut {
 /// # Fields
 ///
 /// * `fifo_p` - The raw FIFO pressure output value as a 32-bit signed integer (read-only).
-#[register(address = Reg::FifoDataOutPressXl, access_type = Ilps22qs, generics = 2)]
+#[register(address = Reg::FifoDataOutPressXl, access_type = "Ilps22qs<B, T, OnState>")]
 #[cfg_attr(feature = "bit_order_msb", bitfield(u32, order = Msb))]
 #[cfg_attr(not(feature = "bit_order_msb"), bitfield(u32, order = Lsb))]
 pub struct FifoDataOutPress {
@@ -503,7 +506,7 @@ pub struct FifoDataOutPress {
 /// # Fields
 ///
 /// * `whoami` - The device identification value as an 8-bit unsigned integer (read-only).
-#[register(address = Reg::WhoAmI, access_type = Ilps22qs, generics = 2)]
+#[register(address = Reg::WhoAmI, access_type = "Ilps22qs<B, T, OnState>")]
 #[cfg_attr(feature = "bit_order_msb", bitfield(u8, order = Msb))]
 #[cfg_attr(not(feature = "bit_order_msb"), bitfield(u8, order = Lsb))]
 pub struct WhoAmI {
