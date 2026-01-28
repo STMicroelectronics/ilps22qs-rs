@@ -28,7 +28,7 @@ Add the driver to your `Cargo.toml` dependencies:
 
 ```toml
 [dependencies]
-ilps22qs-rs = "0.1.0"
+ilps22qs-rs = "2.0.0"
 ```
 
 Or, add it directly from the terminal:
@@ -39,9 +39,28 @@ cargo add ilps22qs-rs
 
 ## Usage
 
-Include the crate and its prelude
+By default, the create exposes the **asynchronous** API, and it could be included using:
 ```rust
-use ilps22qs_rs as ilps22qs;
+use ilps22qs_rs::asynchronous as ilps22qs;
+use ilps22qs::*;
+use ilps22qs::prelude::*;
+```
+
+### Blocking API (optional feature)
+
+To use the **blocking** API instead of the asynchronous one, disable default features and enable the `blocking` feature in your Cargo.toml
+```toml
+[dependencies]
+ilps22qs_rs-rs = { version = "2.0.0", default-features = false, features = ["blocking"] }
+```
+or from the terminal:
+```sh
+cargo add ilps22qs_rs-rs --no-default-features --features blocking
+```
+
+Then import the blocking API:
+```rust
+use ilps22qs_rs::blocking as ilps22qs;
 use ilps22qs::*;
 use ilps22qs::prelude::*;
 ```
