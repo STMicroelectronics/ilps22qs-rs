@@ -51,11 +51,11 @@ use ilps22qs::prelude::*;
 To use the **blocking** API instead of the asynchronous one, disable default features and enable the `blocking` feature in your Cargo.toml
 ```toml
 [dependencies]
-ilps22qs_rs-rs = { version = "2.0.0", default-features = false, features = ["blocking"] }
+ilps22qs-rs = { version = "2.0.0", default-features = false, features = ["blocking"] }
 ```
 or from the terminal:
 ```sh
-cargo add ilps22qs_rs-rs --no-default-features --features blocking
+cargo add ilps22qs-rs --no-default-features --features blocking
 ```
 
 Then import the blocking API:
