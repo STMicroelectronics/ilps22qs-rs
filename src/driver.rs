@@ -1195,8 +1195,10 @@ pub fn from_lsb_to_mv(lsb: i32) -> f32 {
 #[repr(u8)]
 #[derive(Clone, Copy, PartialEq)]
 pub enum I2CAddress {
-    /// The I2C address for the device, set to `0x5c`.
-    I2cAdd = 0x5c,
+    /// SD0 bit set to low, then I2c address is `0x5c`.
+    SD0Low = 0x5c,
+    /// SD0 bit set to high, then I2c address is `0x5d`.
+    SD0High = 0x5d,
 }
 
 /// Device Who am I.
